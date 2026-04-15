@@ -12,7 +12,6 @@ def enhance_image(frame):
     Returns (enhanced_frame, sobel_edge_map).
     """
 
-    # 1. Automatic Brightness & Contrast Adjustment
     avg_brightness = np.mean(frame)
     target_brightness = 127
     brightness_diff = target_brightness - avg_brightness
@@ -20,7 +19,6 @@ def enhance_image(frame):
     beta  = brightness_diff * 0.5
     enhanced = cv2.convertScaleAbs(frame, alpha=alpha, beta=beta)
 
-    # 2. CLAHE on LAB lightness channel
     lab = cv2.cvtColor(enhanced, cv2.COLOR_BGR2LAB)
     l, a, b = cv2.split(lab)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
@@ -28,17 +26,14 @@ def enhance_image(frame):
     enhanced = cv2.merge((cl, a, b))
     enhanced = cv2.cvtColor(enhanced, cv2.COLOR_LAB2BGR)
 
-    # 3. Gaussian noise reduction
     enhanced = cv2.GaussianBlur(enhanced, (3, 3), 0)
 
-    # 4. HSV saturation boost (+20 %)
     hsv = cv2.cvtColor(enhanced, cv2.COLOR_BGR2HSV).astype("float32")
     h, s, v = cv2.split(hsv)
     s = np.clip(s * 1.2, 0, 255)
     enhanced = cv2.merge((h, s, v))
     enhanced = cv2.cvtColor(enhanced.astype("uint8"), cv2.COLOR_HSV2BGR)
 
-    # 5. Sobel edge map (returned for optional overlay/analysis use)
     gray   = cv2.cvtColor(enhanced, cv2.COLOR_BGR2GRAY)
     sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)
     sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)

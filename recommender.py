@@ -1,12 +1,13 @@
 import json
+import re
 
 class FashionRecommender:
     def __init__(self, model="llama3"):
         self.model_name  = model
         self.last_recommendation = "Detecting outfit..."
         self.cooldown    = 0
-        self.cooldown_limit = 45   # frames between LLM calls
-        self._ollama_ok  = True    # set False on first fatal error
+        self.cooldown_limit = 45
+        self._ollama_ok  = True
         self._ollama     = None
         try:
             import ollama as _ol
@@ -15,13 +16,32 @@ class FashionRecommender:
             print("ollama package not found – using rule-based recommendations.")
             self._ollama_ok = False
 
-    def generate_recommendation(self, outfit):
-        """
-        Return a fashion recommendation string.
-        Tries Ollama first; silently falls back to rule-based logic on any error.
-        """
-        if not outfit:
-            return "No clothing detected."
+    def _clean_llm_output(self, raw_text):
+        """Sanitize LLM output for clean, single-line display."""
+        text = raw_text.strip()
+        text = re.sub(r'\*+', '', text)
+        text = re.sub(r'#+\s*', '', text)
+        text = re.sub(r'^[-•]\s*', '', text)
+        text = re.sub(r'"', '', text)
+        text = re.sub(r'\n+', ' ', text)
+        text = re.sub(r'\s{2,}', ' ', text)
+        text = text.strip('. ').strip()
+        
+        sentences = re.split(r'(?<=[.!?])\s+', text)
+        if sentences:
+            result = sentences[0].strip()
+            if not result.endswith(('.', '!', '?')):
+                result += '.'
+            return result
+        return text
+
+    def generate_recommendation(self, outfit_data, gender="Unknown"):
+        """Return a stylish fashion recommendation based on the outfit and gender."""
+        upper = outfit_data.get("upper")
+        lower = outfit_data.get("lower")
+
+        if not upper and not lower:
+            return "Detecting outfit..."
 
         if self.cooldown > 0:
             self.cooldown -= 1
@@ -30,46 +50,55 @@ class FashionRecommender:
         self.cooldown = self.cooldown_limit
 
         if self._ollama_ok and self._ollama is not None:
+            items = []
+            if upper: items.append(f"{upper['color']} {upper['label']}")
+            if lower: items.append(f"{lower['color']} {lower['label']}")
+            outfit_desc = ", ".join(items)
+
             prompt = (
-                f"I am wearing: {json.dumps(outfit)}. "
-                "Give one short stylish fashion tip (1 sentence). Be concise."
+                f"You are a premium fashion stylist. A {gender} is wearing: {outfit_desc}. "
+                "Respond with ONLY one single sentence of styling advice. "
+                "No bullet points, no lists, no markdown, no quotation marks. "
+                "Just one clean, elegant sentence under 20 words."
             )
             try:
                 response = self._ollama.chat(
                     model=self.model_name,
-                    messages=[{"role": "user", "content": prompt}]
+                    messages=[
+                        {"role": "system", "content": "You are a concise fashion advisor. Always reply in exactly one short sentence with no formatting."},
+                        {"role": "user", "content": prompt}
+                    ]
                 )
-                self.last_recommendation = response["message"]["content"].strip()
+                raw = response["message"]["content"]
+                self.last_recommendation = self._clean_llm_output(raw)
                 return self.last_recommendation
             except Exception as e:
-                print(f"Ollama unavailable ({type(e).__name__}): switching to rule-based mode.")
-                self._ollama_ok = False   # don't retry this session
+                print(f"Ollama unavailable: falling back to premium style rules.")
+                self._ollama_ok = False
 
-        self.last_recommendation = self.get_rule_based_recommendation(outfit)
+        self.last_recommendation = self.get_premium_style_rules(upper, lower, gender)
         return self.last_recommendation
 
-    def get_rule_based_recommendation(self, outfit):
-        items = [f"{color} {item}" for item, color in outfit.items()]
-        desc  = ", ".join(items).lower()
+    def get_premium_style_rules(self, upper, lower, gender="Unknown"):
+        """Stylish rule-based fallbacks."""
+        g = gender.lower()
+        
+        items = []
+        if upper: items.append(f"{upper['color']} {upper['label']}")
+        if lower: items.append(f"{lower['color']} {lower['label']}")
+        desc = " ".join(items).lower()
 
         if "dress" in desc:
-            return "A classic dress shines with simple heels and minimal jewellery."
-        if "coat" in desc or "sweater" in desc:
-            return "Layer with a scarf in a complementary tone for a polished look."
-        if "skirt" in desc:
-            return "Pair a skirt with a tucked-in blouse for an effortless chic vibe."
-        if "shirt" in desc and "t-shirt" not in desc:
-            return "A semi-formal shirt looks great tucked in with a slim belt."
-        if "t-shirt" in desc and "pants" in desc:
-            return "Layer with a light jacket to elevate this casual street-wear look."
-        if "t-shirt" in desc:
-            return "A classic tee pairs perfectly with clean sneakers and a simple watch."
-        if "red" in desc:
-            return "Red is bold – keep accessories minimal and let the colour speak."
-        if "blue" in desc:
-            return "Blue tones pair beautifully with white or earth-toned accessories."
-        if "black" in desc:
-            return "An all-black outfit is timeless – add a metallic accent to pop."
+            return "A classic dress shines with sleek heels and minimal, elegant jewelry."
+        
+        if g == "male":
+            if "shirt" in desc:
+                return "A crisp shirt tucked in with a leather belt creates a timeless, sharp profile."
+            return "A clean, tailored fit is the key to elevated masculine style."
+        
+        if g == "female":
+            if "top" in desc:
+                return "Layering a refined top with delicate accessories creates a sophisticated, modern look."
+            return "Focus on balanced proportions and elegant textures to elevate your silhouette."
 
-        return "Experiment with layering different textures to elevate your outfit!"
-
+        return "Experiment with different textures and fit to elevate your personal style."
