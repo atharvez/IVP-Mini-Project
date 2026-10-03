@@ -1,39 +1,50 @@
-# Real-Time Outfit Detection and Color Recommendation System
+﻿# IVP Mini Project â€” AI Fashion & Person Analysis ðŸ‘—ðŸ”
 
-This system uses YOLOv8 for object detection, Hugging Face models for fine-grained color classification, and Ollama (local LLM) for intelligent fashion recommendations.
+Image and Video Processing mini project using YOLOv8 for person detection, gender classification, and fashion recommendation.
 
-## 🚀 Features
-- **Real-Time Webcam Feed**: Enhanced using spatial-domain processing.
-- **Image Enhancement**: CLAHE, Gaussian Blur, Sobel edges, and Saturation boosting.
-- **YOLOv8 Detection**: Specifically tracks clothing items and people.
-- **AI Color Classification**: Uses `prithivMLmods/Fashion-Product-baseColour` (SigLIP2) for accurate color naming.
-- **Ollama Recommendations**: Local LLM provides stylish advice based on your current outfit.
+## Overview
 
-## 🛠 Installation
+A computer vision pipeline that:
+1. **Detects persons** using YOLOv8
+2. **Classifies gender** from detected regions
+3. **Analyzes clothing colors** for style matching
+4. **Recommends fashion items** based on detected styles
 
-1. **Install Python Dependencies**:
-   ```bash
-   pip install opencv-python numpy ultralytics torch torchvision transformers pillow ollama requests
-   ```
+## Tech Stack
 
-2. **Ollama Setup**:
-   Ensure you have [Ollama](https://ollama.com/) installed and run:
-   ```bash
-   ollama pull llama3
-   ```
+| Component | Technology |
+|-----------|-----------|
+| Object Detection | YOLOv8 (Ultralytics) |
+| Computer Vision | OpenCV |
+| Deep Learning | PyTorch |
+| Language | Python 3.9+ |
 
-3. **Run the Application**:
-   ```bash
-   python main.py
-   ```
+## Project Structure
 
-## 🎮 Controls
-- **Q**: Quit application
-- **E**: Toggle Image Enhancement (On/Off)
+```
+IVP-Mini-Project/
+â”œâ”€â”€ main.py                 # Pipeline entry point
+â”œâ”€â”€ detection.py            # YOLOv8 person detection
+â”œâ”€â”€ enhancement.py          # Image pre-processing
+â”œâ”€â”€ color_utils.py          # Clothing color extraction
+â”œâ”€â”€ gender_utils.py         # Gender classification
+â”œâ”€â”€ recommender.py          # Fashion recommendation engine
+â”œâ”€â”€ train_fashion.py        # Fashion classifier training
+â”œâ”€â”€ yolov8n.pt             # Pre-trained YOLOv8 weights
+â””â”€â”€ requirements.txt
+```
 
-## 📁 Project Structure
-- `main.py`: Main application loop.
-- `enhancement.py`: Phase 1 Image Processing logic.
-- `detection.py`: Phase 2 YOLOv8 Integration.
-- `color_utils.py`: Phase 3 AI Color classification.
-- `recommender.py`: Phase 4 Ollama recommendation logic.
+## Getting Started
+
+```bash
+git clone https://github.com/atharvez/IVP-Mini-Project.git
+cd IVP-Mini-Project
+python -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python main.py --image Images/sample.jpg
+```
+
+## Course
+
+Image and Video Processing (IVP) Mini Project â€” [Atharva Desai](https://github.com/atharvez)
