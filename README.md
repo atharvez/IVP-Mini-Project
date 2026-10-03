@@ -24,15 +24,15 @@ A computer vision pipeline that:
 
 ```
 IVP-Mini-Project/
-â”œâ”€â”€ main.py                 # Pipeline entry point
-â”œâ”€â”€ detection.py            # YOLOv8 person detection
-â”œâ”€â”€ enhancement.py          # Image pre-processing
-â”œâ”€â”€ color_utils.py          # Clothing color extraction
-â”œâ”€â”€ gender_utils.py         # Gender classification
-â”œâ”€â”€ recommender.py          # Fashion recommendation engine
-â”œâ”€â”€ train_fashion.py        # Fashion classifier training
-â”œâ”€â”€ yolov8n.pt             # Pre-trained YOLOv8 weights
-â””â”€â”€ requirements.txt
+|-- main.py                 # Pipeline entry point
+|-- detection.py            # YOLOv8 person detection
+|-- enhancement.py          # Image pre-processing
+|-- color_utils.py          # Clothing color extraction
+|-- gender_utils.py         # Gender classification
+|-- recommender.py          # Fashion recommendation engine
+|-- train_fashion.py        # Fashion classifier training
+|-- yolov8n.pt             # Pre-trained YOLOv8 weights
+\-- requirements.txt
 ```
 
 ## Getting Started
