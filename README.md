@@ -1,14 +1,15 @@
-﻿# IVP Mini Project â€” AI Fashion & Person Analysis ðŸ‘—ðŸ”
+# IVP Mini Project -- AI Fashion and Person Analysis
 
 Image and Video Processing mini project using YOLOv8 for person detection, gender classification, and fashion recommendation.
 
 ## Overview
 
 A computer vision pipeline that:
-1. **Detects persons** using YOLOv8
-2. **Classifies gender** from detected regions
-3. **Analyzes clothing colors** for style matching
-4. **Recommends fashion items** based on detected styles
+
+1. Detects persons using YOLOv8
+2. Classifies gender from detected regions
+3. Analyzes clothing colors for style matching
+4. Recommends fashion items based on detected styles
 
 ## Tech Stack
 
@@ -47,4 +48,4 @@ python main.py --image Images/sample.jpg
 
 ## Course
 
-Image and Video Processing (IVP) Mini Project â€” [Atharva Desai](https://github.com/atharvez)
+Image and Video Processing (IVP) Mini Project -- Atharva Desai
